@@ -9,35 +9,91 @@
 mullInternalMatrix:
 .LFB43:
 	.cfi_startproc
-	leaq	1048576(%rdx), %r10
-	leaq	1048576(%rsi), %r8
-	movq	%rdi, %r9
+	pushq	%r14
+	.cfi_def_cfa_offset 16
+	.cfi_offset 14, -16
+	pushq	%r13
+	.cfi_def_cfa_offset 24
+	.cfi_offset 13, -24
+	leaq	16(%rdx), %r13
+	pushq	%r12
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -32
+	leaq	64(%rdx), %r14
+	pushq	%rbp
+	.cfi_def_cfa_offset 40
+	.cfi_offset 6, -40
+	leaq	64(%rsi), %r12
+	pushq	%rbx
+	.cfi_def_cfa_offset 48
+	.cfi_offset 3, -48
+	movq	%r13, %r11
 .L2:
-	movq	%rsi, %rcx
-	movq	%r9, %rdi
+	movq	%rsi, %rax
+	movq	%rdi, %r8
+	movq	%rdi, %rcx
+.L10:
+	movq	%rax, %r9
+	addq	$16, %rax
+	leaq	4(%rcx), %r10
+	cmpq	%rax, %rdx
+	setnb	%bpl
+	cmpq	%r11, %r9
+	setnb	%bl
+	orb	%bl, %bpl
+	je	.L11
+	cmpq	%rcx, %r11
+	setbe	%bl
+	cmpq	%r10, %rdx
+	setnb	%cl
+	orb	%cl, %bl
+	je	.L11
+	movss	(%r8), %xmm0
+	shufps	$0, %xmm0, %xmm0
+	movups	(%r9), %xmm1
+	mulps	%xmm1, %xmm0
+	movups	(%rdx), %xmm1
+	addps	%xmm1, %xmm0
+	movups	%xmm0, (%rdx)
+.L4:
+	addq	$4, %r8
+	cmpq	%r12, %rax
+	movq	%r10, %rcx
+	jne	.L10
+	addq	$16, %rdi
+	addq	$16, %r11
+	cmpq	%r13, %r14
+	movq	%r13, %rdx
+	je	.L1
+	addq	$16, %r13
+	jmp	.L2
 	.p2align 4,,10
 	.p2align 3
-.L6:
-	xorl	%eax, %eax
-	.p2align 4,,10
-	.p2align 3
+.L11:
+	xorl	%ecx, %ecx
 .L3:
-	movss	(%rdi), %xmm0
-	mulss	(%rcx,%rax), %xmm0
-	addss	(%rdx,%rax), %xmm0
-	movss	%xmm0, (%rdx,%rax)
-	addq	$4, %rax
-	cmpq	$2048, %rax
+	movss	(%r8), %xmm0
+	mulss	(%r9,%rcx), %xmm0
+	addss	(%rdx,%rcx), %xmm0
+	movss	%xmm0, (%rdx,%rcx)
+	addq	$4, %rcx
+	cmpq	$16, %rcx
 	jne	.L3
-	addq	$2048, %rcx
-	addq	$4, %rdi
-	cmpq	%rcx, %r8
-	jne	.L6
-	addq	$2048, %rdx
-	addq	$2048, %r9
-	cmpq	%rdx, %r10
-	jne	.L2
-	rep ret
+	jmp	.L4
+	.p2align 4,,10
+	.p2align 3
+.L1:
+	popq	%rbx
+	.cfi_def_cfa_offset 40
+	popq	%rbp
+	.cfi_def_cfa_offset 32
+	popq	%r12
+	.cfi_def_cfa_offset 24
+	popq	%r13
+	.cfi_def_cfa_offset 16
+	popq	%r14
+	.cfi_def_cfa_offset 8
+	ret
 	.cfi_endproc
 .LFE43:
 	.size	mullInternalMatrix, .-mullInternalMatrix
@@ -55,59 +111,68 @@ mullInternalMatrix:
 mullExternalMatrix:
 .LFB42:
 	.cfi_startproc
-	pushq	%r14
+	pushq	%r15
 	.cfi_def_cfa_offset 16
-	.cfi_offset 14, -16
-	pushq	%r13
+	.cfi_offset 15, -16
+	pushq	%r14
 	.cfi_def_cfa_offset 24
-	.cfi_offset 13, -24
-	movq	%rdi, %r14
-	pushq	%r12
+	.cfi_offset 14, -24
+	movq	%rdi, %r15
+	pushq	%r13
 	.cfi_def_cfa_offset 32
-	.cfi_offset 12, -32
-	pushq	%rbp
+	.cfi_offset 13, -32
+	pushq	%r12
 	.cfi_def_cfa_offset 40
-	.cfi_offset 6, -40
-	movq	%rsi, %r13
-	pushq	%rbx
+	.cfi_offset 12, -40
+	movq	%rsi, %r14
+	pushq	%rbp
 	.cfi_def_cfa_offset 48
-	.cfi_offset 3, -48
-	movq	%rdx, %r12
+	.cfi_offset 6, -48
+	pushq	%rbx
+	.cfi_def_cfa_offset 56
+	.cfi_offset 3, -56
+	movq	%rdx, %r13
+	xorl	%r12d, %r12d
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 64
+.L19:
 	xorl	%ebp, %ebp
-.L10:
+	.p2align 4,,10
+	.p2align 3
+.L23:
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L14:
-	xorl	%r11d, %r11d
-	.p2align 4,,10
-	.p2align 3
-.L11:
-	movq	(%r12,%rbp), %rax
-	movq	(%rax,%rbx), %rdx
-	movq	0(%r13,%r11), %rax
-	movq	(%rax,%rbx), %rsi
-	movq	(%r14,%rbp), %rax
-	movq	(%rax,%r11), %rdi
-	call	mullInternalMatrix
-	addq	$8, %r11
-	cmpq	$4096, %r11
-	jne	.L11
+.L20:
+	movq	0(%r13,%r12), %rax
+	movq	(%rax,%rbp), %rdx
+	movq	(%r14,%rbx), %rax
+	movq	(%rax,%rbp), %rsi
+	movq	(%r15,%r12), %rax
+	movq	(%rax,%rbx), %rdi
 	addq	$8, %rbx
+	call	mullInternalMatrix
 	cmpq	$4096, %rbx
-	jne	.L14
+	jne	.L20
 	addq	$8, %rbp
 	cmpq	$4096, %rbp
-	jne	.L10
+	jne	.L23
+	addq	$8, %r12
+	cmpq	$4096, %r12
+	jne	.L19
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 56
 	popq	%rbx
-	.cfi_def_cfa_offset 40
+	.cfi_def_cfa_offset 48
 	popq	%rbp
-	.cfi_def_cfa_offset 32
+	.cfi_def_cfa_offset 40
 	popq	%r12
-	.cfi_def_cfa_offset 24
+	.cfi_def_cfa_offset 32
 	popq	%r13
-	.cfi_def_cfa_offset 16
+	.cfi_def_cfa_offset 24
 	popq	%r14
+	.cfi_def_cfa_offset 16
+	popq	%r15
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
@@ -149,17 +214,15 @@ fillMatrixRandElem:
 	.cfi_offset 3, -56
 	subq	$8, %rsp
 	.cfi_def_cfa_offset 64
-.L18:
+.L27:
 	xorl	%ebp, %ebp
-.L24:
-	movl	$2048, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L22:
-	leaq	-2048(%rbx), %r13
-	.p2align 4,,10
-	.p2align 3
-.L19:
+.L33:
+	movl	$16, %ebx
+.L31:
+	leaq	-16(%rbx), %r13
+.L28:
 	movq	(%r15), %rax
 	movq	%r13, %r14
 	addq	(%rax,%rbp), %r14
@@ -174,16 +237,16 @@ fillMatrixRandElem:
 	cmpq	%r13, %rbx
 	cvtsi2ss	%eax, %xmm0
 	movss	%xmm0, (%r14)
-	jne	.L19
-	addq	$2048, %rbx
-	cmpq	$1050624, %rbx
-	jne	.L22
+	jne	.L28
+	addq	$16, %rbx
+	cmpq	$80, %rbx
+	jne	.L31
 	addq	$8, %rbp
 	cmpq	$4096, %rbp
-	jne	.L24
+	jne	.L33
 	addq	$8, %r15
 	cmpq	%r15, %r12
-	jne	.L18
+	jne	.L27
 	addq	$8, %rsp
 	.cfi_def_cfa_offset 56
 	popq	%rbx
@@ -240,33 +303,33 @@ allocMemMatrix:
 	movq	%rax, %rbx
 	.p2align 4,,10
 	.p2align 3
-.L28:
+.L37:
 	movl	$512, %esi
 	movl	$8, %edi
 	addq	$8, %rbx
 	call	calloc
 	movq	%rax, -8(%rbx)
 	cmpq	%rbx, %r13
-	jne	.L28
+	jne	.L37
 	.p2align 4,,10
 	.p2align 3
-.L29:
+.L38:
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L30:
+.L39:
 	movq	%rbx, %rbp
 	addq	(%r12), %rbp
-	movl	$262144, %esi
+	movl	$16, %esi
 	movl	$4, %edi
 	addq	$8, %rbx
 	call	calloc
 	cmpq	$4096, %rbx
 	movq	%rax, 0(%rbp)
-	jne	.L30
+	jne	.L39
 	addq	$8, %r12
 	cmpq	%r12, %r13
-	jne	.L29
+	jne	.L38
 	popq	%rbx
 	.cfi_def_cfa_offset 40
 	movq	%r14, %rax
@@ -317,28 +380,28 @@ freeMemMatrix:
 	movq	%rdi, %rbp
 	.p2align 4,,10
 	.p2align 3
-.L36:
+.L45:
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L37:
+.L46:
 	movq	(%r14), %rax
 	movq	(%rax,%rbx), %rdi
 	addq	$8, %rbx
 	call	free
 	cmpq	$4096, %rbx
-	jne	.L37
+	jne	.L46
 	addq	$8, %r14
 	cmpq	%r14, %r12
-	jne	.L36
+	jne	.L45
 	.p2align 4,,10
 	.p2align 3
-.L39:
+.L48:
 	movq	0(%rbp), %rdi
 	addq	$8, %rbp
 	call	free
 	cmpq	%rbp, %r12
-	jne	.L39
+	jne	.L48
 	popq	%rbx
 	.cfi_def_cfa_offset 40
 	movq	%r13, %rdi
@@ -400,7 +463,7 @@ main:
 	movq	%rbx, %rdi
 	call	fillMatrixRandElem
 #APP
-# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+# 86 "/home/howki/workspace/ASP/1lab/src/base.c" 1
 	rdtsc
 # 0 "" 2
 #NO_APP
@@ -412,17 +475,17 @@ main:
 	movq	%r12, %rdx
 	call	mullExternalMatrix
 #APP
-# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+# 86 "/home/howki/workspace/ASP/1lab/src/base.c" 1
 	rdtsc
 # 0 "" 2
 #NO_APP
 	salq	$32, %rdx
 	orq	%rdx, %rax
 	subq	%r13, %rax
-	js	.L44
+	js	.L53
 	pxor	%xmm0, %xmm0
 	cvtsi2sdq	%rax, %xmm0
-.L45:
+.L54:
 	mulsd	.LC5(%rip), %xmm0
 	movl	$.LC6, %esi
 	movl	$1, %edi
@@ -447,7 +510,7 @@ main:
 	popq	%r13
 	.cfi_def_cfa_offset 8
 	ret
-.L44:
+.L53:
 	.cfi_restore_state
 	movq	%rax, %rdx
 	pxor	%xmm0, %xmm0
@@ -456,7 +519,7 @@ main:
 	orq	%rax, %rdx
 	cvtsi2sdq	%rdx, %xmm0
 	addsd	%xmm0, %xmm0
-	jmp	.L45
+	jmp	.L54
 	.cfi_endproc
 .LFE41:
 	.size	main, .-main
@@ -476,7 +539,7 @@ MAX_RAND_DIV:
 	.type	SIZE_INT_MATRIX, @object
 	.size	SIZE_INT_MATRIX, 4
 SIZE_INT_MATRIX:
-	.long	512
+	.long	4
 	.globl	SIZE_EXT_MATRIX
 	.align 4
 	.type	SIZE_EXT_MATRIX, @object

@@ -11,7 +11,7 @@ SIZE_EXT_MATRIX:
 	.type	SIZE_INT_MATRIX, @object
 	.size	SIZE_INT_MATRIX, 4
 SIZE_INT_MATRIX:
-	.long	512
+	.long	4
 	.globl	MAX_RAND_DIV
 	.align 4
 	.type	MAX_RAND_DIV, @object
@@ -189,50 +189,48 @@ mullInternalMatrix:
 	movq	%rdi, -24(%rbp)
 	movq	%rsi, -32(%rbp)
 	movq	%rdx, -40(%rbp)
-	movl	$0, -16(%rbp)
+	movl	$0, -12(%rbp)
 	jmp	.L13
 .L18:
-	movl	$0, -12(%rbp)
+	movl	$0, -8(%rbp)
 	jmp	.L14
 .L17:
-	movl	-12(%rbp), %eax
-	movl	%eax, -4(%rbp)
-	movl	$0, -8(%rbp)
+	movl	$0, -4(%rbp)
 	jmp	.L15
 .L16:
-	movl	$512, %eax
-	imull	-16(%rbp), %eax
+	movl	$4, %eax
+	imull	-12(%rbp), %eax
 	movl	%eax, %edx
-	movl	-8(%rbp), %eax
+	movl	-4(%rbp), %eax
 	addl	%edx, %eax
 	cltq
 	leaq	0(,%rax,4), %rdx
 	movq	-40(%rbp), %rax
 	addq	%rdx, %rax
-	movl	$512, %edx
+	movl	$4, %edx
 	movl	%edx, %ecx
-	imull	-16(%rbp), %ecx
-	movl	-8(%rbp), %edx
+	imull	-12(%rbp), %ecx
+	movl	-4(%rbp), %edx
 	addl	%ecx, %edx
 	movslq	%edx, %rdx
 	leaq	0(,%rdx,4), %rcx
 	movq	-40(%rbp), %rdx
 	addq	%rcx, %rdx
 	movss	(%rdx), %xmm1
-	movl	$512, %edx
+	movl	$4, %edx
 	movl	%edx, %ecx
-	imull	-16(%rbp), %ecx
-	movl	-4(%rbp), %edx
+	imull	-12(%rbp), %ecx
+	movl	-8(%rbp), %edx
 	addl	%ecx, %edx
 	movslq	%edx, %rdx
 	leaq	0(,%rdx,4), %rcx
 	movq	-24(%rbp), %rdx
 	addq	%rcx, %rdx
 	movss	(%rdx), %xmm2
-	movl	$512, %edx
+	movl	$4, %edx
 	movl	%edx, %ecx
-	imull	-4(%rbp), %ecx
-	movl	-8(%rbp), %edx
+	imull	-8(%rbp), %ecx
+	movl	-4(%rbp), %edx
 	addl	%ecx, %edx
 	movslq	%edx, %rdx
 	leaq	0(,%rdx,4), %rcx
@@ -242,20 +240,20 @@ mullInternalMatrix:
 	mulss	%xmm2, %xmm0
 	addss	%xmm1, %xmm0
 	movss	%xmm0, (%rax)
-	addl	$1, -8(%rbp)
+	addl	$1, -4(%rbp)
 .L15:
-	movl	$512, %eax
-	cmpl	%eax, -8(%rbp)
+	movl	$4, %eax
+	cmpl	%eax, -4(%rbp)
 	jl	.L16
-	addl	$1, -12(%rbp)
+	addl	$1, -8(%rbp)
 .L14:
-	movl	$512, %eax
-	cmpl	%eax, -12(%rbp)
+	movl	$4, %eax
+	cmpl	%eax, -8(%rbp)
 	jl	.L17
-	addl	$1, -16(%rbp)
+	addl	$1, -12(%rbp)
 .L13:
-	movl	$512, %eax
-	cmpl	%eax, -16(%rbp)
+	movl	$4, %eax
+	cmpl	%eax, -12(%rbp)
 	jl	.L18
 	nop
 	popq	%rbp
@@ -301,7 +299,7 @@ fillMatrixRandElem:
 	salq	$3, %rdx
 	addq	%rdx, %rax
 	movq	(%rax), %rax
-	movl	$512, %edx
+	movl	$4, %edx
 	movl	%edx, %ecx
 	imull	-24(%rbp), %ecx
 	movl	-20(%rbp), %edx
@@ -319,12 +317,12 @@ fillMatrixRandElem:
 	movss	%xmm0, (%rbx)
 	addl	$1, -20(%rbp)
 .L23:
-	movl	$512, %eax
+	movl	$4, %eax
 	cmpl	%eax, -20(%rbp)
 	jl	.L24
 	addl	$1, -24(%rbp)
 .L22:
-	movl	$512, %eax
+	movl	$4, %eax
 	cmpl	%eax, -24(%rbp)
 	jl	.L25
 	addl	$1, -28(%rbp)
@@ -400,8 +398,8 @@ allocMemMatrix:
 	movslq	%edx, %rdx
 	salq	$3, %rdx
 	leaq	(%rax,%rdx), %rbx
-	movl	$512, %edx
-	movl	$512, %eax
+	movl	$4, %edx
+	movl	$4, %eax
 	imull	%edx, %eax
 	cltq
 	movq	%rax, %rsi
@@ -504,7 +502,7 @@ rdtsc:
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
 #APP
-# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+# 86 "/home/howki/workspace/ASP/1lab/src/base.c" 1
 	rdtsc
 # 0 "" 2
 #NO_APP

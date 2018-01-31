@@ -1,6 +1,7 @@
 SOURCE_DIR=${PWD}/src
 OBJ_DIR=${PWD}/obj
 INSTALL_DIR=${PWD}/bin
+CFLAGS_OPT=-O2 -ftree-vectorize -msse2
 
 TARGET_OPT_BASE=optBase
 TARGET_BASE=base
@@ -24,7 +25,7 @@ install_opt: ${INSTALL_DIR}/${TARGET_OPT_BASE}
 ${INSTALL_DIR}/${TARGET_OPT_BASE}: ${OBJ_DIR}/${TARGET_OPT_BASE}.o
 	gcc ${OBJ_DIR}/${TARGET_OPT_BASE}.o -o ${INSTALL_DIR}/${TARGET_OPT_BASE}
 ${OBJ_DIR}/${TARGET_OPT_BASE}.o: ${SOURCE_DIR}/${TARGET_BASE}.c
-	gcc -c -O2 ${SOURCE_DIR}/${TARGET_BASE}.c -o ${OBJ_DIR}/${TARGET_OPT_BASE}.o
+	gcc -c ${CFLAGS_OPT} ${SOURCE_DIR}/${TARGET_BASE}.c -o ${OBJ_DIR}/${TARGET_OPT_BASE}.o
 
 disassembly: disasm_base disasm_optBase
 
@@ -36,7 +37,7 @@ ${SOURCE_DIR}/${TARGET_BASE}.s: ${SOURCE_DIR}/${TARGET_BASE}.c
 disasm_optBase: ${SOURCE_DIR}/${TARGET_OPT_BASE}.s
 
 ${SOURCE_DIR}/${TARGET_OPT_BASE}.s: ${SOURCE_DIR}/${TARGET_BASE}.c
-	gcc -O2 -S ${SOURCE_DIR}/${TARGET_BASE}.c -o ${SOURCE_DIR}/${TARGET_OPT_BASE}.s
+	gcc ${CFLAGS_OPT} -S ${SOURCE_DIR}/${TARGET_BASE}.c -o ${SOURCE_DIR}/${TARGET_OPT_BASE}.s
 
 clean:
 	rm ${INSTALL_DIR}/* ${OBJ_DIR}/* ${SOURCE_DIR}/*.s
