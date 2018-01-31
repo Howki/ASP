@@ -11,13 +11,16 @@ SIZE_EXT_MATRIX:
 	.type	SIZE_INT_MATRIX, @object
 	.size	SIZE_INT_MATRIX, 4
 SIZE_INT_MATRIX:
-	.long	4
+	.long	512
 	.globl	MAX_RAND_DIV
 	.align 4
 	.type	MAX_RAND_DIV, @object
 	.size	MAX_RAND_DIV, 4
 MAX_RAND_DIV:
 	.long	128
+	.align 8
+.LC1:
+	.string	"Elapsed time: %.5f (seconds).\n"
 	.text
 	.globl	main
 	.type	main, @function
@@ -55,6 +58,27 @@ main:
 	movq	%rcx, %rsi
 	movq	%rax, %rdi
 	call	mullExternalMatrix
+	call	rdtsc
+	subq	-8(%rbp), %rax
+	testq	%rax, %rax
+	js	.L2
+	pxor	%xmm0, %xmm0
+	cvtsi2sdq	%rax, %xmm0
+	jmp	.L3
+.L2:
+	movq	%rax, %rdx
+	shrq	%rdx
+	andl	$1, %eax
+	orq	%rax, %rdx
+	pxor	%xmm0, %xmm0
+	cvtsi2sdq	%rdx, %xmm0
+	addsd	%xmm0, %xmm0
+.L3:
+	movsd	.LC0(%rip), %xmm1
+	divsd	%xmm1, %xmm0
+	movl	$.LC1, %edi
+	movl	$1, %eax
+	call	printf
 	movq	-32(%rbp), %rax
 	movq	%rax, %rdi
 	call	freeMemMatrix
@@ -86,14 +110,14 @@ mullExternalMatrix:
 	movq	%rsi, -32(%rbp)
 	movq	%rdx, -40(%rbp)
 	movl	$0, -12(%rbp)
-	jmp	.L4
-.L9:
-	movl	$0, -8(%rbp)
-	jmp	.L5
-.L8:
-	movl	$0, -4(%rbp)
 	jmp	.L6
-.L7:
+.L11:
+	movl	$0, -8(%rbp)
+	jmp	.L7
+.L10:
+	movl	$0, -4(%rbp)
+	jmp	.L8
+.L9:
 	movl	-12(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -131,20 +155,20 @@ mullExternalMatrix:
 	movq	%rax, %rdi
 	call	mullInternalMatrix
 	addl	$1, -4(%rbp)
-.L6:
+.L8:
 	movl	$512, %eax
 	cmpl	%eax, -4(%rbp)
-	jl	.L7
+	jl	.L9
 	addl	$1, -8(%rbp)
-.L5:
+.L7:
 	movl	$512, %eax
 	cmpl	%eax, -8(%rbp)
-	jl	.L8
+	jl	.L10
 	addl	$1, -12(%rbp)
-.L4:
+.L6:
 	movl	$512, %eax
 	cmpl	%eax, -12(%rbp)
-	jl	.L9
+	jl	.L11
 	nop
 	leave
 	.cfi_def_cfa 7, 8
@@ -165,17 +189,19 @@ mullInternalMatrix:
 	movq	%rdi, -24(%rbp)
 	movq	%rsi, -32(%rbp)
 	movq	%rdx, -40(%rbp)
-	movl	$0, -12(%rbp)
-	jmp	.L11
-.L16:
-	movl	$0, -8(%rbp)
-	jmp	.L12
-.L15:
-	movl	$0, -4(%rbp)
+	movl	$0, -16(%rbp)
 	jmp	.L13
-.L14:
-	movl	$4, %eax
-	imull	-12(%rbp), %eax
+.L18:
+	movl	$0, -12(%rbp)
+	jmp	.L14
+.L17:
+	movl	-12(%rbp), %eax
+	movl	%eax, -4(%rbp)
+	movl	$0, -8(%rbp)
+	jmp	.L15
+.L16:
+	movl	$512, %eax
+	imull	-16(%rbp), %eax
 	movl	%eax, %edx
 	movl	-8(%rbp), %eax
 	addl	%edx, %eax
@@ -183,9 +209,9 @@ mullInternalMatrix:
 	leaq	0(,%rax,4), %rdx
 	movq	-40(%rbp), %rax
 	addq	%rdx, %rax
-	movl	$4, %edx
+	movl	$512, %edx
 	movl	%edx, %ecx
-	imull	-12(%rbp), %ecx
+	imull	-16(%rbp), %ecx
 	movl	-8(%rbp), %edx
 	addl	%ecx, %edx
 	movslq	%edx, %rdx
@@ -193,9 +219,9 @@ mullInternalMatrix:
 	movq	-40(%rbp), %rdx
 	addq	%rcx, %rdx
 	movss	(%rdx), %xmm1
-	movl	$4, %edx
+	movl	$512, %edx
 	movl	%edx, %ecx
-	imull	-12(%rbp), %ecx
+	imull	-16(%rbp), %ecx
 	movl	-4(%rbp), %edx
 	addl	%ecx, %edx
 	movslq	%edx, %rdx
@@ -203,7 +229,7 @@ mullInternalMatrix:
 	movq	-24(%rbp), %rdx
 	addq	%rcx, %rdx
 	movss	(%rdx), %xmm2
-	movl	$4, %edx
+	movl	$512, %edx
 	movl	%edx, %ecx
 	imull	-4(%rbp), %ecx
 	movl	-8(%rbp), %edx
@@ -216,21 +242,21 @@ mullInternalMatrix:
 	mulss	%xmm2, %xmm0
 	addss	%xmm1, %xmm0
 	movss	%xmm0, (%rax)
-	addl	$1, -4(%rbp)
-.L13:
-	movl	$4, %eax
-	cmpl	%eax, -4(%rbp)
-	jl	.L14
 	addl	$1, -8(%rbp)
-.L12:
-	movl	$4, %eax
+.L15:
+	movl	$512, %eax
 	cmpl	%eax, -8(%rbp)
-	jl	.L15
-	addl	$1, -12(%rbp)
-.L11:
-	movl	$4, %eax
-	cmpl	%eax, -12(%rbp)
 	jl	.L16
+	addl	$1, -12(%rbp)
+.L14:
+	movl	$512, %eax
+	cmpl	%eax, -12(%rbp)
+	jl	.L17
+	addl	$1, -16(%rbp)
+.L13:
+	movl	$512, %eax
+	cmpl	%eax, -16(%rbp)
+	jl	.L18
 	nop
 	popq	%rbp
 	.cfi_def_cfa 7, 8
@@ -253,17 +279,17 @@ fillMatrixRandElem:
 	.cfi_offset 3, -24
 	movq	%rdi, -40(%rbp)
 	movl	$0, -32(%rbp)
-	jmp	.L18
-.L25:
-	movl	$0, -28(%rbp)
-	jmp	.L19
-.L24:
-	movl	$0, -24(%rbp)
 	jmp	.L20
-.L23:
-	movl	$0, -20(%rbp)
+.L27:
+	movl	$0, -28(%rbp)
 	jmp	.L21
-.L22:
+.L26:
+	movl	$0, -24(%rbp)
+	jmp	.L22
+.L25:
+	movl	$0, -20(%rbp)
+	jmp	.L23
+.L24:
 	movl	-32(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -275,7 +301,7 @@ fillMatrixRandElem:
 	salq	$3, %rdx
 	addq	%rdx, %rax
 	movq	(%rax), %rax
-	movl	$4, %edx
+	movl	$512, %edx
 	movl	%edx, %ecx
 	imull	-24(%rbp), %ecx
 	movl	-20(%rbp), %edx
@@ -292,25 +318,25 @@ fillMatrixRandElem:
 	cvtsi2ss	%eax, %xmm0
 	movss	%xmm0, (%rbx)
 	addl	$1, -20(%rbp)
-.L21:
-	movl	$4, %eax
+.L23:
+	movl	$512, %eax
 	cmpl	%eax, -20(%rbp)
-	jl	.L22
+	jl	.L24
 	addl	$1, -24(%rbp)
-.L20:
-	movl	$4, %eax
+.L22:
+	movl	$512, %eax
 	cmpl	%eax, -24(%rbp)
-	jl	.L23
+	jl	.L25
 	addl	$1, -28(%rbp)
-.L19:
+.L21:
 	movl	$512, %eax
 	cmpl	%eax, -28(%rbp)
-	jl	.L24
+	jl	.L26
 	addl	$1, -32(%rbp)
-.L18:
+.L20:
 	movl	$512, %eax
 	cmpl	%eax, -32(%rbp)
-	jl	.L25
+	jl	.L27
 	nop
 	addq	$40, %rsp
 	popq	%rbx
@@ -340,8 +366,8 @@ allocMemMatrix:
 	call	calloc
 	movq	%rax, -24(%rbp)
 	movl	$0, -36(%rbp)
-	jmp	.L27
-.L28:
+	jmp	.L29
+.L30:
 	movl	-36(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -354,16 +380,16 @@ allocMemMatrix:
 	call	calloc
 	movq	%rax, (%rbx)
 	addl	$1, -36(%rbp)
-.L27:
+.L29:
 	movl	$512, %eax
 	cmpl	%eax, -36(%rbp)
-	jl	.L28
+	jl	.L30
 	movl	$0, -32(%rbp)
-	jmp	.L29
-.L32:
+	jmp	.L31
+.L34:
 	movl	$0, -28(%rbp)
-	jmp	.L30
-.L31:
+	jmp	.L32
+.L33:
 	movl	-32(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -374,8 +400,8 @@ allocMemMatrix:
 	movslq	%edx, %rdx
 	salq	$3, %rdx
 	leaq	(%rax,%rdx), %rbx
-	movl	$4, %edx
-	movl	$4, %eax
+	movl	$512, %edx
+	movl	$512, %eax
 	imull	%edx, %eax
 	cltq
 	movq	%rax, %rsi
@@ -383,15 +409,15 @@ allocMemMatrix:
 	call	calloc
 	movq	%rax, (%rbx)
 	addl	$1, -28(%rbp)
-.L30:
+.L32:
 	movl	$512, %eax
 	cmpl	%eax, -28(%rbp)
-	jl	.L31
+	jl	.L33
 	addl	$1, -32(%rbp)
-.L29:
+.L31:
 	movl	$512, %eax
 	cmpl	%eax, -32(%rbp)
-	jl	.L32
+	jl	.L34
 	movq	-24(%rbp), %rax
 	addq	$40, %rsp
 	popq	%rbx
@@ -414,11 +440,11 @@ freeMemMatrix:
 	subq	$32, %rsp
 	movq	%rdi, -24(%rbp)
 	movl	$0, -12(%rbp)
-	jmp	.L35
-.L38:
+	jmp	.L37
+.L40:
 	movl	$0, -8(%rbp)
-	jmp	.L36
-.L37:
+	jmp	.L38
+.L39:
 	movl	-12(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -433,18 +459,18 @@ freeMemMatrix:
 	movq	%rax, %rdi
 	call	free
 	addl	$1, -8(%rbp)
-.L36:
+.L38:
 	movl	$512, %eax
 	cmpl	%eax, -8(%rbp)
-	jl	.L37
+	jl	.L39
 	addl	$1, -12(%rbp)
-.L35:
+.L37:
 	movl	$512, %eax
 	cmpl	%eax, -12(%rbp)
-	jl	.L38
+	jl	.L40
 	movl	$0, -4(%rbp)
-	jmp	.L39
-.L40:
+	jmp	.L41
+.L42:
 	movl	-4(%rbp), %eax
 	cltq
 	leaq	0(,%rax,8), %rdx
@@ -454,10 +480,10 @@ freeMemMatrix:
 	movq	%rax, %rdi
 	call	free
 	addl	$1, -4(%rbp)
-.L39:
+.L41:
 	movl	$512, %eax
 	cmpl	%eax, -4(%rbp)
-	jl	.L40
+	jl	.L42
 	movq	-24(%rbp), %rax
 	movq	%rax, %rdi
 	call	free
@@ -478,7 +504,7 @@ rdtsc:
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
 #APP
-# 86 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
 	rdtsc
 # 0 "" 2
 #NO_APP
@@ -493,5 +519,10 @@ rdtsc:
 	.cfi_endproc
 .LFE8:
 	.size	rdtsc, .-rdtsc
+	.section	.rodata
+	.align 8
+.LC0:
+	.long	0
+	.long	1105199104
 	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.6) 5.4.0 20160609"
 	.section	.note.GNU-stack,"",@progbits

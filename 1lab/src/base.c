@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
   unsigned long long timeElapsed = rdtsc();
 
   mullExternalMatrix(matrixA, matrixB, matrixC);
-
-  /*printf("Elapsed time: %f (seconds).\n", (timeElapsed - rdtsc()) / pow(2, 21));*/
+  
+  printf("Elapsed time: %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
 
   freeMemMatrix(matrixA);
   freeMemMatrix(matrixB);
@@ -44,8 +44,8 @@ void mullExternalMatrix(float ***matrixA, float ***matrixB, float ***matrixC) {
 
 void mullInternalMatrix(float *matrixA, float *matrixB, float *matrixC) {
   for(int i = 0; i < SIZE_INT_MATRIX; i++)
-    for(int j = 0; j < SIZE_INT_MATRIX; j++)
-      for(int k = 0; k < SIZE_INT_MATRIX; k++)
+    for(int k = 0; k < SIZE_INT_MATRIX; k++)
+      for(int j = 0; j < SIZE_INT_MATRIX; j++)
         matrixC[i * SIZE_INT_MATRIX + j] += matrixA[i * SIZE_INT_MATRIX + k] * matrixB[k * SIZE_INT_MATRIX + j];
 }
 

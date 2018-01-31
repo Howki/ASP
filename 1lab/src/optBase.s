@@ -4,139 +4,43 @@
 	.text
 .LHOTB0:
 	.p2align 4,,15
-	.globl	mullExternalMatrix
-	.type	mullExternalMatrix, @function
-mullExternalMatrix:
-.LFB51:
+	.globl	mullInternalMatrix
+	.type	mullInternalMatrix, @function
+mullInternalMatrix:
+.LFB43:
 	.cfi_startproc
-	pushq	%r13
-	.cfi_def_cfa_offset 16
-	.cfi_offset 13, -16
-	pushq	%r12
-	.cfi_def_cfa_offset 24
-	.cfi_offset 12, -24
-	movq	%rdi, %r12
-	pushq	%rbp
-	.cfi_def_cfa_offset 32
-	.cfi_offset 6, -32
-	movq	%rdx, %rbp
-	pushq	%rbx
-	.cfi_def_cfa_offset 40
-	.cfi_offset 3, -40
-	xorl	%ebx, %ebx
+	leaq	1048576(%rdx), %r10
+	leaq	1048576(%rsi), %r8
+	movq	%rdi, %r9
 .L2:
-	movq	0(%rbp,%rbx), %r13
-	movq	(%r12,%rbx), %rdi
-	xorl	%r11d, %r11d
-.L7:
-	movq	0(%r13,%r11), %rdx
-	xorl	%r9d, %r9d
-	leaq	64(%rdx), %r10
+	movq	%rsi, %rcx
+	movq	%r9, %rdi
 	.p2align 4,,10
 	.p2align 3
-.L4:
-	movq	(%rsi,%r9), %rax
-	movq	(%rdi,%r9), %rcx
-	movq	(%rax,%r11), %r8
-	movq	%rdx, %rax
+.L6:
+	xorl	%eax, %eax
+	.p2align 4,,10
+	.p2align 3
 .L3:
-	movss	(%rcx), %xmm1
-	addq	$16, %rax
-	addq	$16, %rcx
-	mulss	(%r8), %xmm1
-	movss	-16(%rax), %xmm2
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -16(%rax)
-	movss	16(%r8), %xmm0
-	mulss	-12(%rcx), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	-12(%rax), %xmm2
-	movss	%xmm1, -16(%rax)
-	movss	-8(%rcx), %xmm0
-	mulss	32(%r8), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -16(%rax)
-	movss	-4(%rcx), %xmm1
-	mulss	48(%r8), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -16(%rax)
-	movss	-16(%rcx), %xmm1
-	mulss	4(%r8), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -12(%rax)
-	movss	-12(%rcx), %xmm0
-	mulss	20(%r8), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	-8(%rax), %xmm2
-	movss	%xmm1, -12(%rax)
-	movss	-8(%rcx), %xmm0
-	mulss	36(%r8), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -12(%rax)
-	movss	-4(%rcx), %xmm1
-	mulss	52(%r8), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -12(%rax)
-	movss	-16(%rcx), %xmm1
-	mulss	8(%r8), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -8(%rax)
-	movss	-12(%rcx), %xmm0
-	mulss	24(%r8), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	%xmm1, -8(%rax)
-	movss	-8(%rcx), %xmm0
-	mulss	40(%r8), %xmm0
-	movss	-4(%rax), %xmm2
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -8(%rax)
-	movss	-4(%rcx), %xmm1
-	mulss	56(%r8), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -8(%rax)
-	movss	-16(%rcx), %xmm1
-	mulss	12(%r8), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -4(%rax)
-	movss	-12(%rcx), %xmm0
-	mulss	28(%r8), %xmm0
-	addss	%xmm2, %xmm0
-	movss	%xmm0, -4(%rax)
-	movaps	%xmm0, %xmm1
-	movss	-8(%rcx), %xmm0
-	mulss	44(%r8), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -4(%rax)
-	movss	-4(%rcx), %xmm1
-	mulss	60(%r8), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -4(%rax)
-	cmpq	%rax, %r10
+	movss	(%rdi), %xmm0
+	mulss	(%rcx,%rax), %xmm0
+	addss	(%rdx,%rax), %xmm0
+	movss	%xmm0, (%rdx,%rax)
+	addq	$4, %rax
+	cmpq	$2048, %rax
 	jne	.L3
-	addq	$8, %r9
-	cmpq	$4096, %r9
-	jne	.L4
-	addq	$8, %r11
-	cmpq	$4096, %r11
-	jne	.L7
-	addq	$8, %rbx
-	cmpq	$4096, %rbx
+	addq	$2048, %rcx
+	addq	$4, %rdi
+	cmpq	%rcx, %r8
+	jne	.L6
+	addq	$2048, %rdx
+	addq	$2048, %r9
+	cmpq	%rdx, %r10
 	jne	.L2
-	popq	%rbx
-	.cfi_def_cfa_offset 32
-	popq	%rbp
-	.cfi_def_cfa_offset 24
-	popq	%r12
-	.cfi_def_cfa_offset 16
-	popq	%r13
-	.cfi_def_cfa_offset 8
-	ret
+	rep ret
 	.cfi_endproc
-.LFE51:
-	.size	mullExternalMatrix, .-mullExternalMatrix
+.LFE43:
+	.size	mullInternalMatrix, .-mullInternalMatrix
 	.section	.text.unlikely
 .LCOLDE0:
 	.text
@@ -146,93 +50,69 @@ mullExternalMatrix:
 	.text
 .LHOTB1:
 	.p2align 4,,15
-	.globl	mullInternalMatrix
-	.type	mullInternalMatrix, @function
-mullInternalMatrix:
-.LFB52:
+	.globl	mullExternalMatrix
+	.type	mullExternalMatrix, @function
+mullExternalMatrix:
+.LFB42:
 	.cfi_startproc
-	leaq	64(%rdx), %rax
-.L13:
-	movss	(%rdi), %xmm1
-	addq	$16, %rdx
-	addq	$16, %rdi
-	mulss	(%rsi), %xmm1
-	movss	-16(%rdx), %xmm2
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -16(%rdx)
-	movss	16(%rsi), %xmm0
-	mulss	-12(%rdi), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	-12(%rdx), %xmm2
-	movss	%xmm1, -16(%rdx)
-	movss	-8(%rdi), %xmm0
-	mulss	32(%rsi), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -16(%rdx)
-	movss	-4(%rdi), %xmm1
-	mulss	48(%rsi), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -16(%rdx)
-	movss	-16(%rdi), %xmm1
-	mulss	4(%rsi), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -12(%rdx)
-	movss	-12(%rdi), %xmm0
-	mulss	20(%rsi), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	-8(%rdx), %xmm2
-	movss	%xmm1, -12(%rdx)
-	movss	-8(%rdi), %xmm0
-	mulss	36(%rsi), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -12(%rdx)
-	movss	-4(%rdi), %xmm1
-	mulss	52(%rsi), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -12(%rdx)
-	movss	-16(%rdi), %xmm1
-	mulss	8(%rsi), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -8(%rdx)
-	movss	-12(%rdi), %xmm0
-	mulss	24(%rsi), %xmm0
-	movaps	%xmm0, %xmm1
-	addss	%xmm2, %xmm1
-	movss	%xmm1, -8(%rdx)
-	movss	-8(%rdi), %xmm0
-	mulss	40(%rsi), %xmm0
-	movss	-4(%rdx), %xmm2
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -8(%rdx)
-	movss	-4(%rdi), %xmm1
-	mulss	56(%rsi), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -8(%rdx)
-	movss	-16(%rdi), %xmm1
-	mulss	12(%rsi), %xmm1
-	addss	%xmm1, %xmm2
-	movss	%xmm2, -4(%rdx)
-	movss	-12(%rdi), %xmm0
-	mulss	28(%rsi), %xmm0
-	addss	%xmm2, %xmm0
-	movss	%xmm0, -4(%rdx)
-	movaps	%xmm0, %xmm1
-	movss	-8(%rdi), %xmm0
-	mulss	44(%rsi), %xmm0
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -4(%rdx)
-	movss	-4(%rdi), %xmm1
-	mulss	60(%rsi), %xmm1
-	addss	%xmm1, %xmm0
-	movss	%xmm0, -4(%rdx)
-	cmpq	%rdx, %rax
-	jne	.L13
-	rep ret
+	pushq	%r14
+	.cfi_def_cfa_offset 16
+	.cfi_offset 14, -16
+	pushq	%r13
+	.cfi_def_cfa_offset 24
+	.cfi_offset 13, -24
+	movq	%rdi, %r14
+	pushq	%r12
+	.cfi_def_cfa_offset 32
+	.cfi_offset 12, -32
+	pushq	%rbp
+	.cfi_def_cfa_offset 40
+	.cfi_offset 6, -40
+	movq	%rsi, %r13
+	pushq	%rbx
+	.cfi_def_cfa_offset 48
+	.cfi_offset 3, -48
+	movq	%rdx, %r12
+	xorl	%ebp, %ebp
+.L10:
+	xorl	%ebx, %ebx
+	.p2align 4,,10
+	.p2align 3
+.L14:
+	xorl	%r11d, %r11d
+	.p2align 4,,10
+	.p2align 3
+.L11:
+	movq	(%r12,%rbp), %rax
+	movq	(%rax,%rbx), %rdx
+	movq	0(%r13,%r11), %rax
+	movq	(%rax,%rbx), %rsi
+	movq	(%r14,%rbp), %rax
+	movq	(%rax,%r11), %rdi
+	call	mullInternalMatrix
+	addq	$8, %r11
+	cmpq	$4096, %r11
+	jne	.L11
+	addq	$8, %rbx
+	cmpq	$4096, %rbx
+	jne	.L14
+	addq	$8, %rbp
+	cmpq	$4096, %rbp
+	jne	.L10
+	popq	%rbx
+	.cfi_def_cfa_offset 40
+	popq	%rbp
+	.cfi_def_cfa_offset 32
+	popq	%r12
+	.cfi_def_cfa_offset 24
+	popq	%r13
+	.cfi_def_cfa_offset 16
+	popq	%r14
+	.cfi_def_cfa_offset 8
+	ret
 	.cfi_endproc
-.LFE52:
-	.size	mullInternalMatrix, .-mullInternalMatrix
+.LFE42:
+	.size	mullExternalMatrix, .-mullExternalMatrix
 	.section	.text.unlikely
 .LCOLDE1:
 	.text
@@ -245,7 +125,7 @@ mullInternalMatrix:
 	.globl	fillMatrixRandElem
 	.type	fillMatrixRandElem, @function
 fillMatrixRandElem:
-.LFB53:
+.LFB44:
 	.cfi_startproc
 	pushq	%r15
 	.cfi_def_cfa_offset 16
@@ -269,15 +149,17 @@ fillMatrixRandElem:
 	.cfi_offset 3, -56
 	subq	$8, %rsp
 	.cfi_def_cfa_offset 64
-.L16:
+.L18:
 	xorl	%ebp, %ebp
+.L24:
+	movl	$2048, %ebx
 	.p2align 4,,10
 	.p2align 3
 .L22:
-	movl	$16, %ebx
-.L20:
-	leaq	-16(%rbx), %r13
-.L17:
+	leaq	-2048(%rbx), %r13
+	.p2align 4,,10
+	.p2align 3
+.L19:
 	movq	(%r15), %rax
 	movq	%r13, %r14
 	addq	(%rax,%rbp), %r14
@@ -292,16 +174,16 @@ fillMatrixRandElem:
 	cmpq	%r13, %rbx
 	cvtsi2ss	%eax, %xmm0
 	movss	%xmm0, (%r14)
-	jne	.L17
-	addq	$16, %rbx
-	cmpq	$80, %rbx
-	jne	.L20
+	jne	.L19
+	addq	$2048, %rbx
+	cmpq	$1050624, %rbx
+	jne	.L22
 	addq	$8, %rbp
 	cmpq	$4096, %rbp
-	jne	.L22
+	jne	.L24
 	addq	$8, %r15
 	cmpq	%r15, %r12
-	jne	.L16
+	jne	.L18
 	addq	$8, %rsp
 	.cfi_def_cfa_offset 56
 	popq	%rbx
@@ -318,7 +200,7 @@ fillMatrixRandElem:
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
-.LFE53:
+.LFE44:
 	.size	fillMatrixRandElem, .-fillMatrixRandElem
 	.section	.text.unlikely
 .LCOLDE2:
@@ -332,7 +214,7 @@ fillMatrixRandElem:
 	.globl	allocMemMatrix
 	.type	allocMemMatrix, @function
 allocMemMatrix:
-.LFB54:
+.LFB45:
 	.cfi_startproc
 	pushq	%r14
 	.cfi_def_cfa_offset 16
@@ -358,33 +240,33 @@ allocMemMatrix:
 	movq	%rax, %rbx
 	.p2align 4,,10
 	.p2align 3
-.L26:
+.L28:
 	movl	$512, %esi
 	movl	$8, %edi
 	addq	$8, %rbx
 	call	calloc
 	movq	%rax, -8(%rbx)
 	cmpq	%rbx, %r13
-	jne	.L26
+	jne	.L28
 	.p2align 4,,10
 	.p2align 3
-.L27:
+.L29:
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L28:
+.L30:
 	movq	%rbx, %rbp
 	addq	(%r12), %rbp
-	movl	$16, %esi
+	movl	$262144, %esi
 	movl	$4, %edi
 	addq	$8, %rbx
 	call	calloc
 	cmpq	$4096, %rbx
 	movq	%rax, 0(%rbp)
-	jne	.L28
+	jne	.L30
 	addq	$8, %r12
 	cmpq	%r12, %r13
-	jne	.L27
+	jne	.L29
 	popq	%rbx
 	.cfi_def_cfa_offset 40
 	movq	%r14, %rax
@@ -398,7 +280,7 @@ allocMemMatrix:
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
-.LFE54:
+.LFE45:
 	.size	allocMemMatrix, .-allocMemMatrix
 	.section	.text.unlikely
 .LCOLDE3:
@@ -412,7 +294,7 @@ allocMemMatrix:
 	.globl	freeMemMatrix
 	.type	freeMemMatrix, @function
 freeMemMatrix:
-.LFB55:
+.LFB46:
 	.cfi_startproc
 	pushq	%r14
 	.cfi_def_cfa_offset 16
@@ -435,28 +317,28 @@ freeMemMatrix:
 	movq	%rdi, %rbp
 	.p2align 4,,10
 	.p2align 3
-.L34:
+.L36:
 	xorl	%ebx, %ebx
 	.p2align 4,,10
 	.p2align 3
-.L35:
+.L37:
 	movq	(%r14), %rax
 	movq	(%rax,%rbx), %rdi
 	addq	$8, %rbx
 	call	free
 	cmpq	$4096, %rbx
-	jne	.L35
+	jne	.L37
 	addq	$8, %r14
 	cmpq	%r14, %r12
-	jne	.L34
+	jne	.L36
 	.p2align 4,,10
 	.p2align 3
-.L37:
+.L39:
 	movq	0(%rbp), %rdi
 	addq	$8, %rbp
 	call	free
 	cmpq	%rbp, %r12
-	jne	.L37
+	jne	.L39
 	popq	%rbx
 	.cfi_def_cfa_offset 40
 	movq	%r13, %rdi
@@ -470,32 +352,41 @@ freeMemMatrix:
 	.cfi_def_cfa_offset 8
 	jmp	free
 	.cfi_endproc
-.LFE55:
+.LFE46:
 	.size	freeMemMatrix, .-freeMemMatrix
 	.section	.text.unlikely
 .LCOLDE4:
 	.text
 .LHOTE4:
+	.section	.rodata.str1.8,"aMS",@progbits,1
+	.align 8
+.LC6:
+	.string	"Elapsed time: %.5f (seconds).\n"
 	.section	.text.unlikely
-.LCOLDB5:
+.LCOLDB7:
 	.section	.text.startup,"ax",@progbits
-.LHOTB5:
+.LHOTB7:
 	.p2align 4,,15
 	.globl	main
 	.type	main, @function
 main:
-.LFB50:
+.LFB41:
 	.cfi_startproc
-	pushq	%r12
+	pushq	%r13
 	.cfi_def_cfa_offset 16
-	.cfi_offset 12, -16
-	pushq	%rbp
+	.cfi_offset 13, -16
+	pushq	%r12
 	.cfi_def_cfa_offset 24
-	.cfi_offset 6, -24
+	.cfi_offset 12, -24
 	xorl	%eax, %eax
-	pushq	%rbx
+	pushq	%rbp
 	.cfi_def_cfa_offset 32
-	.cfi_offset 3, -32
+	.cfi_offset 6, -32
+	pushq	%rbx
+	.cfi_def_cfa_offset 40
+	.cfi_offset 3, -40
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 48
 	call	allocMemMatrix
 	movq	%rax, %rbp
 	xorl	%eax, %eax
@@ -509,35 +400,70 @@ main:
 	movq	%rbx, %rdi
 	call	fillMatrixRandElem
 #APP
-# 86 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
 	rdtsc
 # 0 "" 2
 #NO_APP
-	movq	%r12, %rdx
+	salq	$32, %rdx
 	movq	%rbx, %rsi
 	movq	%rbp, %rdi
+	orq	%rax, %rdx
+	movq	%rdx, %r13
+	movq	%r12, %rdx
 	call	mullExternalMatrix
+#APP
+# 88 "/home/howki/workspace/ASP/1lab/src/base.c" 1
+	rdtsc
+# 0 "" 2
+#NO_APP
+	salq	$32, %rdx
+	orq	%rdx, %rax
+	subq	%r13, %rax
+	js	.L44
+	pxor	%xmm0, %xmm0
+	cvtsi2sdq	%rax, %xmm0
+.L45:
+	mulsd	.LC5(%rip), %xmm0
+	movl	$.LC6, %esi
+	movl	$1, %edi
+	movl	$1, %eax
+	call	__printf_chk
 	movq	%rbp, %rdi
 	call	freeMemMatrix
 	movq	%rbx, %rdi
 	call	freeMemMatrix
 	movq	%r12, %rdi
 	call	freeMemMatrix
-	popq	%rbx
-	.cfi_def_cfa_offset 24
+	addq	$8, %rsp
+	.cfi_remember_state
+	.cfi_def_cfa_offset 40
 	xorl	%eax, %eax
+	popq	%rbx
+	.cfi_def_cfa_offset 32
 	popq	%rbp
-	.cfi_def_cfa_offset 16
+	.cfi_def_cfa_offset 24
 	popq	%r12
+	.cfi_def_cfa_offset 16
+	popq	%r13
 	.cfi_def_cfa_offset 8
 	ret
+.L44:
+	.cfi_restore_state
+	movq	%rax, %rdx
+	pxor	%xmm0, %xmm0
+	shrq	%rdx
+	andl	$1, %eax
+	orq	%rax, %rdx
+	cvtsi2sdq	%rdx, %xmm0
+	addsd	%xmm0, %xmm0
+	jmp	.L45
 	.cfi_endproc
-.LFE50:
+.LFE41:
 	.size	main, .-main
 	.section	.text.unlikely
-.LCOLDE5:
+.LCOLDE7:
 	.section	.text.startup
-.LHOTE5:
+.LHOTE7:
 	.globl	MAX_RAND_DIV
 	.section	.rodata
 	.align 4
@@ -550,12 +476,17 @@ MAX_RAND_DIV:
 	.type	SIZE_INT_MATRIX, @object
 	.size	SIZE_INT_MATRIX, 4
 SIZE_INT_MATRIX:
-	.long	4
+	.long	512
 	.globl	SIZE_EXT_MATRIX
 	.align 4
 	.type	SIZE_EXT_MATRIX, @object
 	.size	SIZE_EXT_MATRIX, 4
 SIZE_EXT_MATRIX:
 	.long	512
+	.section	.rodata.cst8,"aM",@progbits,8
+	.align 8
+.LC5:
+	.long	0
+	.long	1040187392
 	.ident	"GCC: (Ubuntu 5.4.0-6ubuntu1~16.04.6) 5.4.0 20160609"
 	.section	.note.GNU-stack,"",@progbits
