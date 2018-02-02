@@ -7,10 +7,7 @@ TARGET_OPT_BASE=optBase
 TARGET_BASE=base
 TARGET_FIN=fin
 
-EXEC=${INSTALL_DIR}/${TARGET_BASE} ${INSTALL_DIR}/${TARGET_OPT_BASE}
-OBJ=${OBJ_DIR}/${TARGET_BASE}.o ${OBJ_DIR}/${TARGET_OPT_BASE}.o
-
-all: install_opt install_base
+all: install_opt install_base install_fin
 
 install_base: ${INSTALL_DIR}/${TARGET_BASE}
 
@@ -26,6 +23,13 @@ ${INSTALL_DIR}/${TARGET_OPT_BASE}: ${OBJ_DIR}/${TARGET_OPT_BASE}.o
 	gcc ${OBJ_DIR}/${TARGET_OPT_BASE}.o -o ${INSTALL_DIR}/${TARGET_OPT_BASE}
 ${OBJ_DIR}/${TARGET_OPT_BASE}.o: ${SOURCE_DIR}/${TARGET_BASE}.c
 	gcc -c ${CFLAGS_OPT} ${SOURCE_DIR}/${TARGET_BASE}.c -o ${OBJ_DIR}/${TARGET_OPT_BASE}.o
+
+install_fin: ${INSTALL_DIR}/${TARGET_FIN}
+
+${INSTALL_DIR}/${TARGET_FIN}: ${OBJ_DIR}/${TARGET_FIN}.o
+	gcc ${OBJ_DIR}/${TARGET_FIN}.o -o ${INSTALL_DIR}/${TARGET_FIN}
+${OBJ_DIR}/${TARGET_FIN}.o: ${SOURCE_DIR}/${TARGET_FIN}.c
+	gcc -c -O0 ${SOURCE_DIR}/${TARGET_FIN}.c -o ${OBJ_DIR}/${TARGET_FIN}.o
 
 disassembly: disasm_base disasm_optBase
 
