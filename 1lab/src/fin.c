@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
-#include <stdlib.h>
 #include <xmmintrin.h>
 #include <time.h>
 
