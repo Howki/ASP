@@ -10,7 +10,7 @@ all: install
 install: ${INSTALL_DIR}/${TARGET}
 
 ${INSTALL_DIR}/${TARGET}: ${OBJ_DIR}/${TARGET}.o
-	gcc ${OBJ_DIR}/${TARGET}.o -o ${INSTALL_DIR}/${TARGET}
+	gcc ${OBJ_DIR}/${TARGET}.o -o ${INSTALL_DIR}/${TARGET} -lm
 
 ${OBJ_DIR}/${TARGET}.o: ${SOURCE_DIR}/${TARGET}.c
 	gcc -c ${CFLAGS_OPT} ${SOURCE_DIR}/${TARGET}.c -o ${OBJ_DIR}/${TARGET}.o
