@@ -3,6 +3,7 @@
 #include <math.h>
 #include <xmmintrin.h>
 #include <time.h>
+#include <omp.h>
 
 static __inline__ unsigned long long rdtsc(void);
 
@@ -21,7 +22,8 @@ void freeMemMatrix(float *);
 
 void printMatrix(float *, int);
 
-const int MAX_RAND_DIV = 4;
+const int MAX_RAND_DIV = 128;
+const int N_THREADS = 4;
 
 int main(int argc, char **argv) {
 
@@ -91,9 +93,9 @@ int main(int argc, char **argv) {
   printf("Elapsed time (no opt): %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
 
   if(compareMatrix(matrixC, matrixD, sizeMatrix))
-    printf("Equal.\n");
+    printf("\nEqual.\n");
   else
-    printf("Not Equal.\n");
+    printf("\nNot Equal.\n");
 
   freeMemMatrix(matrixA);
   freeMemMatrix(matrixB);
@@ -126,18 +128,21 @@ int compareMatrix(float *matrixA, float *matrixB, int sizeMatrix) {
 void mullOptMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix, int sizeBlock) {
   int numberOfBlocks = ceil((float)sizeMatrix / sizeBlock);
 
-  printf("Number of blocks: %d\n", numberOfBlocks);
-
-  for(int i = 0, sizeIBlock = sizeBlock; i < numberOfBlocks; i++) {
-    if(i == numberOfBlocks - 1)
-      sizeIBlock = sizeMatrix - sizeBlock * i;
-    for(int j = 0, sizeJBlock = sizeBlock; j < numberOfBlocks; j++) {
-      if(j == numberOfBlocks - 1)
-        sizeJBlock = sizeMatrix - sizeBlock * j;
-      for(int k = 0, sizeKBlock = sizeBlock; k < numberOfBlocks; k++) {
-        if(k == numberOfBlocks - 1)
-          sizeKBlock = sizeMatrix - sizeBlock * k;
-        mullBlocks(&matrixA[i * sizeMatrix * sizeBlock + k * sizeBlock], &matrixB[k * sizeMatrix * sizeBlock + j * sizeBlock], &matrixC[i * sizeMatrix * sizeBlock + j * sizeBlock], sizeMatrix, sizeIBlock, sizeJBlock, sizeKBlock);
+  printf("Number of blocks: %d\n", (int)pow(numberOfBlocks, 2));
+  
+  #pragma omp parallel num_threads(N_THREADS)
+  {
+    for(int i = 0, sizeIBlock = sizeBlock; i < numberOfBlocks; i++) {
+      if(i == numberOfBlocks - 1)
+        sizeIBlock = sizeMatrix - sizeBlock * i;
+      for(int j = 0, sizeJBlock = sizeBlock; j < numberOfBlocks; j++) {
+        if(j == numberOfBlocks - 1)
+          sizeJBlock = sizeMatrix - sizeBlock * j;
+        for(int k = 0, sizeKBlock = sizeBlock; k < numberOfBlocks; k++) {
+          if(k == numberOfBlocks - 1)
+            sizeKBlock = sizeMatrix - sizeBlock * k;
+          mullBlocks(&matrixA[i * sizeMatrix * sizeBlock + k * sizeBlock], &matrixB[k * sizeMatrix * sizeBlock + j * sizeBlock], &matrixC[i * sizeMatrix * sizeBlock + j * sizeBlock], sizeMatrix, sizeIBlock, sizeJBlock, sizeKBlock);
+        }
       }
     }
   }
@@ -151,10 +156,13 @@ void mullBlocks(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix, 
 }
 
 void mullMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix) {
-  for(int i = 0; i < sizeMatrix; i++)
-    for(int k = 0; k < sizeMatrix; k++)
-      for(int j = 0; j < sizeMatrix; j++)
-        matrixC[i * sizeMatrix + j] += matrixA[i * sizeMatrix + k] * matrixB[k * sizeMatrix + j];
+  #pragma omp parallel num_threads(N_THREADS)
+  {
+    for(int i = 0; i < sizeMatrix; i++)
+      for(int k = 0; k < sizeMatrix; k++)
+        for(int j = 0; j < sizeMatrix; j++)
+          matrixC[i * sizeMatrix + j] += matrixA[i * sizeMatrix + k] * matrixB[k * sizeMatrix + j];
+  }
 }
 
 void fillMatrixRandElem(float *matrix, int sizeMatrix) {
