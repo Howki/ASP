@@ -10,7 +10,7 @@ invokeToDec ()
   echo 123
 }
 
-SIZE_MATRIX=5000 
+SIZE_MATRIX=4411 
 
 echo "ASP - 2 lab. work."
 
