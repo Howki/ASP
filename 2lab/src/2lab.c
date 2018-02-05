@@ -27,6 +27,7 @@ const int MAX_RAND_DIV = 128;
 const int N_THREADS = 4;
 const int N_MATRIX = 3;
 const int CACHE_LINE_SIZE = 16;
+const float K_DIVIDE_BLOCK = 0.2;
 
 int main(int argc, char **argv) {
 
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
 }
 
 int calcOptSizeBlock(int sizeBlock, int sizeMatrix) {
-  int highDivide = sizeBlock * 0.15;
+  int highDivide = sizeBlock * K_DIVIDE_BLOCK;
 
   for(int i = 0; i < highDivide; i++) {
     if(!((sizeBlock + i) % CACHE_LINE_SIZE) && !(sizeMatrix % (sizeBlock + i)))
@@ -144,7 +145,6 @@ void mullOptMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatri
   int numberOfBlocks = ceil((float)sizeMatrix / sizeBlock);
 
   printf("Number of blocks: %d\n", numberOfBlocks);
-  printf("SizeM nBlock = %d\n", sizeMatrix % numberOfBlocks);
 
   #pragma omp parallel for
   for(int i = 0, sizeIBlock = sizeBlock; i < numberOfBlocks; i++) {
