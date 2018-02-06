@@ -28,6 +28,7 @@ const int N_THREADS = 4;
 const int N_MATRIX = 3;
 const int CACHE_LINE_SIZE = 16;
 const float K_DIVIDE_BLOCK = 0.2;
+const float K_USAGE_CACHE = 0.8;
 
 int main(int argc, char **argv) {
 
@@ -40,18 +41,19 @@ int main(int argc, char **argv) {
   int sizeCacheL2 = atoi(argv[2]);
   int sizeCacheL3 = atoi(argv[3]);
   int sizeMatrix = atoi(argv[4]);
+  double FREQ_PROC = pow(2, 31);
 
   printf("\nL1 size - %d (bytes)\n", sizeCacheL1);
   printf("L2 size - %d (bytes)\n", sizeCacheL2);
   printf("L3 size - %d (bytes)\n\n", sizeCacheL3);
 
-  int sizeBlockL1 = calcOptSizeBlock(sqrt(sizeCacheL1 * 0.8 / N_MATRIX / sizeof(float)), sizeMatrix);
-  int sizeBlockL2 = calcOptSizeBlock(sqrt(sizeCacheL2 * 0.8 / N_MATRIX / sizeof(float)), sizeMatrix);
-  int sizeBlockL3 = calcOptSizeBlock(sqrt(sizeCacheL3 * 0.8 / N_MATRIX / sizeof(float)), sizeMatrix);
+  int sizeBlockL1 = calcOptSizeBlock(sqrt(sizeCacheL1 * K_USAGE_CACHE / N_MATRIX / sizeof(float)), sizeMatrix);
+  int sizeBlockL2 = calcOptSizeBlock(sqrt(sizeCacheL2 * K_USAGE_CACHE / N_MATRIX / sizeof(float)), sizeMatrix);
+  int sizeBlockL3 = calcOptSizeBlock(sqrt(sizeCacheL3 * K_USAGE_CACHE / N_MATRIX / sizeof(float)), sizeMatrix);
 
-  printf("L1 cache block size: %d, %x\n", sizeBlockL1, sizeBlockL1);
-  printf("L2 cache block size: %d, %x\n", sizeBlockL2, sizeBlockL2);
-  printf("L3 cache block size: %d, %x\n", sizeBlockL3, sizeBlockL3);
+  printf("L1 cache block size: %d\n", sizeBlockL1);
+  printf("L2 cache block size: %d\n", sizeBlockL2);
+  printf("L3 cache block size: %d\n", sizeBlockL3);
 
   float *matrixA = allocMemMatrix(sizeMatrix);
   float *matrixB = allocMemMatrix(sizeMatrix);
@@ -67,7 +69,7 @@ int main(int argc, char **argv) {
 
   mullOptMatrix(matrixA, matrixB, matrixC, sizeMatrix, sizeBlockL3);
   
-  printf("Elapsed time (L3): %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
+  printf("Elapsed time (L3): %.5f (seconds).\n", (rdtsc() - timeElapsed) / FREQ_PROC);
   
   /*L2*/
   printf("\nL2:\n");
@@ -76,7 +78,7 @@ int main(int argc, char **argv) {
 
   mullOptMatrix(matrixA, matrixB, matrixC, sizeMatrix, sizeBlockL2);
   
-  printf("Elapsed time (L2): %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
+  printf("Elapsed time (L2): %.5f (seconds).\n", (rdtsc() - timeElapsed) / FREQ_PROC);
 
   
   /*L1*/
@@ -86,7 +88,7 @@ int main(int argc, char **argv) {
 
   mullOptMatrix(matrixA, matrixB, matrixC, sizeMatrix, sizeBlockL1);
   
-  printf("Elapsed time (L1): %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
+  printf("Elapsed time (L1): %.5f (seconds).\n", (rdtsc() - timeElapsed) / FREQ_PROC);
 
   /*Without cache opt*/
   printf("\nWithout cache opt:\n");
@@ -94,12 +96,13 @@ int main(int argc, char **argv) {
 
   mullMatrix(matrixA, matrixB, matrixD, sizeMatrix);
 
-  printf("Elapsed time (no opt): %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
+  printf("Elapsed time (no opt): %.5f (seconds).\n", (rdtsc() - timeElapsed) / FREQ_PROC);
 
+  printf("Compare matrix's: ");
   if(compareMatrix(matrixC, matrixD, sizeMatrix))
-    printf("\nEqual.\n");
+    printf("equal.\n");
   else
-    printf("\nNot Equal.\n");
+    printf("not equal.\n");
 
   freeMemMatrix(matrixA);
   freeMemMatrix(matrixB);
