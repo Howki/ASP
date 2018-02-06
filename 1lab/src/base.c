@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
   float ***matrixA = allocMemMatrix();
   float ***matrixB = allocMemMatrix();
   float ***matrixC = allocMemMatrix();
+  double FREQ_PROC = pow(2, 31);
 
   fillMatrixRandElem(matrixA);
   fillMatrixRandElem(matrixB);
@@ -26,7 +27,7 @@ int main(int argc, char **argv) {
 
   mullExternalMatrix(matrixA, matrixB, matrixC);
   
-  printf("Elapsed time: %.5f (seconds).\n", (rdtsc() - timeElapsed) / pow(2, 31));
+  printf("Elapsed time: %.5f (seconds).\n", (rdtsc() - timeElapsed) / FREQ_PROC);
 
   freeMemMatrix(matrixA);
   freeMemMatrix(matrixB);

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SIZE_MATRIX=4000 
+SIZE_MATRIX=4096 
 
 echo "ASP - 2 lab. work."
 

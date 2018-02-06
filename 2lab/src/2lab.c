@@ -1,27 +1,21 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
-#include <xmmintrin.h>
 #include <time.h>
+#include <stdlib.h>
 
 static __inline__ unsigned long long rdtsc(void);
 
 void mullOptMatrix(float *, float *, float *, int, int);
 void mullBlocks(float *, float *, float *, int, int, int, int);
-
 void mullMatrix(float *, float *, float *, int);
-
-int calcOptSizeBlock(int, int);
-
 void fillMatrixRandElem(float *, int);
 void fillMatrixZeroElem(float *, int);
-
-int compareMatrix(float *, float *, int);
-
+void printMatrix(float *, int);
 float* allocMemMatrix(int);
 void freeMemMatrix(float *);
-
-void printMatrix(float *, int);
+int calcOptSizeBlock(int, int);
+int compareMatrix(float *, float *, int);
 
 const int MAX_RAND_DIV = 128;
 const int N_THREADS = 4;
