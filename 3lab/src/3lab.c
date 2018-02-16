@@ -23,13 +23,13 @@ int main(int argc, char **argv) {
 
   double PROC_FREQ = pow(2, 31);
   long BLOCK_SIZE = atoi(argv[1]) / 4;
-  long OFFSET = pow(2, 18);
+  long OFFSET = pow(2, 20);
   int BEGIN_TEST, END_TEST;
+  int* massive = (int*)aligned_alloc(256, OFFSET * 20 * sizeof(int));
 
   for(long int n = MIN_ASSOC; n <= MAX_ASSOC; n++) {
     printf("%ld ", n);
 
-    int* massive = (int*)aligned_alloc(256, OFFSET * n * sizeof(int));
 
     for(unsigned int i = 0; i < BLOCK_SIZE / n; i++)
       for(int j = 0; j < n; j++) {
@@ -51,9 +51,9 @@ int main(int argc, char **argv) {
     END_TEST = rdtsc() - BEGIN_TEST;
 
     printf("%f\n", (float)(END_TEST / NUMBER_ITER));
-    free(massive);
   }
 
+  free(massive);
   return 0;
 }
 

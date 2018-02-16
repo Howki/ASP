@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <omp.h>
 #include <malloc.h>
 #include <math.h>
 #include <time.h>
@@ -143,7 +144,6 @@ void mullOptMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatri
 
   printf("Number of blocks: %d\n", numberOfBlocks);
 
-  #pragma omp parallel for
   for(int i = 0, sizeIBlock = sizeBlock; i < numberOfBlocks; i++) {
     if(i == numberOfBlocks - 1)
       sizeIBlock = sizeMatrix - sizeBlock * i;
@@ -153,13 +153,20 @@ void mullOptMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatri
       for(int k = 0, sizeKBlock = sizeBlock; k < numberOfBlocks; k++) {
         if(k == numberOfBlocks - 1)
           sizeKBlock = sizeMatrix - sizeBlock * k;
-        mullBlocks(&matrixA[i * sizeMatrix * sizeBlock + k * sizeBlock], &matrixB[k * sizeMatrix * sizeBlock + j * sizeBlock], &matrixC[i * sizeMatrix * sizeBlock + j * sizeBlock], sizeMatrix, sizeIBlock, sizeJBlock, sizeKBlock);
+        mullBlocks(&matrixA[i * sizeMatrix * sizeBlock + k * sizeBlock],
+                   &matrixB[k * sizeMatrix * sizeBlock + j * sizeBlock],
+                   &matrixC[i * sizeMatrix * sizeBlock + j * sizeBlock],
+                   sizeMatrix,
+                   sizeIBlock,
+                   sizeJBlock,
+                   sizeKBlock);
       }
     }
   }
 }
 
-void mullBlocks(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix, int sizeIBlock, int sizeJBlock, int sizeKBlock) {
+void __inline__ mullBlocks(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix, int sizeIBlock, int sizeJBlock, int sizeKBlock) {
+  #pragma omp parallel for
   for(int i = 0; i < sizeIBlock; i++)
     for(int k = 0; k < sizeKBlock; k++)
       for(int j = 0; j < sizeJBlock; j++)
@@ -170,7 +177,6 @@ void mullMatrix(float *matrixA, float *matrixB, float *matrixC, int sizeMatrix) 
   #pragma omp parallel for
   for(int i = 0; i < sizeMatrix; i++)
     for(int k = 0; k < sizeMatrix; k++)
-      #pragma simd
       for(int j = 0; j < sizeMatrix; j++)
         matrixC[i * sizeMatrix + j] += matrixA[i * sizeMatrix + k] * matrixB[k * sizeMatrix + j];
 }
